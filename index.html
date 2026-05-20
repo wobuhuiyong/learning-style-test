@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学习人格测试</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #F5F0FF 0%, #EDE4FF 50%, #E5D9FF 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .container {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(139, 126, 200, 0.15);
+    width: 100%;
+    max-width: 520px;
+    padding: 40px 32px 36px;
+    min-height: 440px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+  }
+
+  /* ── Progress Bar ── */
+  .progress-wrap { margin-bottom: 28px; }
+  .progress-bar {
+    height: 6px;
+    background: #EDE4FF;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #A78BFA, #8B7EC8);
+    border-radius: 3px;
+    transition: width 0.35s ease;
+  }
+  .progress-text {
+    text-align: right;
+    font-size: 13px;
+    color: #A78BFA;
+    margin-top: 6px;
+  }
+
+  /* ── Steps (hidden by default) ── */
+  .step { display: none; flex-direction: column; flex: 1; }
+  .step.active { display: flex; }
+
+  /* ── Welcome ── */
+  .welcome { text-align: center; justify-content: center; align-items: center; gap: 20px; }
+  .icon { font-size: 48px; }
+  .welcome h1 {
+    font-size: 28px;
+    color: #5B4A8A;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .welcome .subtitle {
+    font-size: 15px;
+    color: #888;
+    line-height: 1.7;
+  }
+
+  /* ── Question ── */
+  .question-step { gap: 24px; }
+  .question-label {
+    display: inline-block;
+    background: #F0E8FF;
+    color: #8B7EC8;
+    font-size: 13px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    align-self: flex-start;
+  }
+  .question-text {
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 2px solid #EDE4FF;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #FAF8FF;
+  }
+  .option:hover { border-color: #C4B5FD; background: #F5F0FF; }
+  .option.selected { border-color: #8B7EC8; background: #EDE4FF; }
+  .option-letter {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #EDE4FF;
+    color: #8B7EC8;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+  .option.selected .option-letter { background: #8B7EC8; color: #fff; }
+  .option-text { font-size: 15px; color: #444; }
+
+  .nav-btns {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+  }
+
+  /* ── Result ── */
+  .result-step { text-align: center; justify-content: center; align-items: center; gap: 16px; }
+  .result-emoji { font-size: 56px; }
+  .result-name {
+    font-size: 30px;
+    font-weight: 800;
+    color: #5B4A8A;
+  }
+  .result-desc {
+    font-size: 15px;
+    color: #666;
+    line-height: 1.7;
+    padding: 0 8px;
+  }
+  .result-extra {
+    margin-top: 8px;
+    background: #F5F0FF;
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #7C6AAA;
+    line-height: 1.8;
+    text-align: left;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #A78BFA, #8B7EC8);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(139, 126, 200, 0.35);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139, 126, 200, 0.45); }
+  .btn-secondary {
+    background: #fff;
+    color: #8B7EC8;
+    border: 2px solid #EDE4FF;
+  }
+  .btn-secondary:hover { background: #F5F0FF; }
+  .btn-wide { width: 100%; }
+  .btn-small { padding: 8px 20px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+
+  <!-- ═══ Progress ═══ -->
+  <div class="progress-wrap" id="progressWrap" style="display:none;">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-text" id="progressText">0 / 15</div>
+  </div>
+
+  <!-- ═══ Welcome ═══ -->
+  <div class="step active" id="stepWelcome">
+    <div class="welcome">
+      <div class="icon">📚</div>
+      <h1>学习人格测试</h1>
+      <p class="subtitle">SBTI平替款！共15道题，无对错<br>凭第一反应冲就完事儿，不搞虚的～<br>每道题对应你的学习DNA<br>最后解锁专属"学习人格标签"</p>
+      <button class="btn btn-primary" onclick="start()">开始测试</button>
+    </div>
+  </div>
+
+  <!-- ═══ Questions (dynamically rendered) ═══ -->
+  <div class="step question-step" id="stepQuestion">
+    <span class="question-label" id="qLabel"></span>
+    <div class="question-text" id="qText"></div>
+    <div class="options" id="qOptions"></div>
+    <div class="nav-btns">
+      <button class="btn btn-secondary btn-small" id="btnPrev" onclick="prevQuestion()">← 上一题</button>
+      <span></span>
+      <button class="btn btn-primary btn-small" id="btnNext" onclick="nextQuestion()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- ═══ Result ═══ -->
+  <div class="step result-step" id="stepResult">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <div class="result-name" id="resultName"></div>
+    <div class="result-desc" id="resultDesc"></div>
+    <div class="result-extra" id="resultExtra"></div>
+    <button class="btn btn-primary" onclick="restart()" style="margin-top:8px;">重新测试</button>
+  </div>
+
+</div>
+
+<script>
+// ── Data ──
+const questions = [
+  { q: "复习时你更像？", opts: ["自己闷头学", "拉搭子一起", "看网课为主", "思维导图"] },
+  { q: "遇到难题你会？", opts: ["死磕到底", "立刻问人", "先放着缓一缓", "查资料拆解"] },
+  { q: "学习计划你是？", opts: ["随缘无计划", "简单写一下", "照搬别人计划", "详细打卡执行"] },
+  { q: "上课笔记你？", opts: ["几乎不记", "啥都抄", "只记重点", "精致好看为主"] },
+  { q: "周末学习你？", opts: ["在家独处", "图书馆自习室", "边玩边学", "劳逸结合"] },
+  { q: "背知识点你？", opts: ["默读反复看", "大声朗读", "理解为主", "卡片碎片记"] },
+  { q: "小组学习你？", opts: ["沉默旁观", "主动主导", "跟着做就行", "出新奇想法"] },
+  { q: "考前复习你？", opts: ["随便翻翻", "疯狂刷题", "死磕错题", "和同学互押讨论"] },
+  { q: "没人监督你会？", opts: ["直接摆烂", "坚持学习", "学一会儿就溜", "靠打卡自律"] },
+  { q: "别人卷你会？", opts: ["关我啥事", "跟着一起卷", "有点焦虑", "淡定按自己节奏"] },
+  { q: "新知识点你会？", opts: ["慢慢自己啃", "立刻找人讲", "看网课快速过", "整理总结再学"] },
+  { q: "拖延作业你？", opts: ["拖到最后一刻", "提前做完", "边拖边焦虑", "分小段完成"] },
+  { q: "学习环境你偏好？", opts: ["安静独处", "人多有氛围", "随意躺平环境", "整洁舒适桌面"] },
+  { q: "你更依赖？", opts: ["自己悟性", "朋友搭子", "网课资源", "笔记"] },
+  { q: "学习心态你是？", opts: ["佛系随缘", "争强好胜", "跟着大流走", "稳扎稳打"] }
+];
+
+const personalities = [
+  { name: "开摆人", emoji: "🧘", desc: "学习全看心情，计划是摆设，错题是路人，主打一个"佛系裸考也能蒙对"。" },
+  { name: "社恐卷王", emoji: "🤫", desc: "不爱说话，不找搭子，默默刷题悄悄卷，卷赢所有人却不声张。" },
+  { name: "好闺蜜", emoji: "👯", desc: "没搭子学不进去，主打一个"你卷我就卷，你摆我就摆"，搭子是学习的唯一动力。" },
+  { name: "1TB网盘", emoji: "💾", desc: "上课没听懂？网课补！复习没思路？网课救！网课就是学习的"精神支柱"。" },
+  { name: "最强美工", emoji: "🎨", desc: "笔记卷赢全班，颜值拉满，实用性随缘，主打一个"发圈吸赞"。" },
+  { name: "犟种", emoji: "💪", desc: "遇到难题不认输，钻牛角尖但正确率拉满，主打一个"不弄懂不罢休"。" },
+  { name: "你是我的神", emoji: "🙏", desc: "学霸学啥我学啥，学霸用啥我用啥，跟着学霸走，少走十年弯路。" },
+  { name: "时间管理大师", emoji: "⏰", desc: "计划精确到分钟，不拖延、不摸鱼，学习玩兼顾，卷得毫不费力。" },
+  { name: "全能扫描王", emoji: "🧠", desc: "上课不记笔记，全靠脑子硬记，知识点过一遍就刻在DNA里。" },
+  { name: "摸鱼专家", emoji: "🐟", desc: "咸鱼在手，快乐我有，利用一切时间摸鱼，但能保持学习成绩，效率稳如老狗。" },
+  { name: "自习室常住NPC", emoji: "📖", desc: "除了上课，全在自习室，占座、刷题、卷王本王，自带卷王buff。" },
+  { name: "脑洞王者", emoji: "💡", desc: "用奇葩方法学习，比如用歌词记知识点、用漫画理框架，有趣又高效。" },
+  { name: "卡牌大师", emoji: "🃏", desc: "公交、课间、睡前，碎片时间全利用，卡片不离手，悄悄卷赢所有人。" },
+  { name: "天花板", emoji: "👑", desc: "学习、效率、心态全在线，自学、合作样样行，学霸中的学霸。" },
+  { name: "Louder", emoji: "📢", desc: "背书全靠嘴，背东西必须读出声，越大声越有感觉，全班都能听到你的背书声。" }
+];
+
+const promoHTML = `<strong>🎁 每款人格都有专属"摆烂式提分技巧"</strong><br>快入群领取你的专属学习资料～<br>快 @你的学习搭子，看看你们是什么"卷王组合"！`;
+
+const totalQ = questions.length;
+
+// ── State ──
+let answers = new Array(totalQ).fill(-1);
+let current = 0;
+
+// ── Helpers ──
+function $ (id) { return document.getElementById(id); }
+
+function showStep (id) {
+  ["stepWelcome", "stepQuestion", "stepResult"].forEach(function (s) {
+    $(s).classList.remove("active");
+  });
+  $(id).classList.add("active");
+  $("progressWrap").style.display = id === "stepQuestion" ? "block" : "none";
+}
+
+function updateProgress () {
+  var answered = answers.filter(function (v) { return v !== -1; }).length;
+  $("progressFill").style.width = (answered / totalQ * 100) + "%";
+  $("progressText").textContent = answered + " / " + totalQ;
+}
+
+function renderQuestion () {
+  var q = questions[current];
+  $("qLabel").textContent = "第 " + (current + 1) + " 题 / 共 " + totalQ + " 题";
+  $("qText").textContent = q.q;
+
+  var html = "";
+  var letters = ["A", "B", "C", "D"];
+  for (var i = 0; i < q.opts.length; i++) {
+    html += '<div class="option' + (answers[current] === i ? " selected" : "") + '" onclick="selectOption(' + i + ')">';
+    html += '<span class="option-letter">' + letters[i] + '</span>';
+    html += '<span class="option-text">' + q.opts[i] + '</span>';
+    html += "</div>";
+  }
+  $("qOptions").innerHTML = html;
+  $("btnPrev").style.visibility = current === 0 ? "hidden" : "visible";
+  $("btnNext").textContent = current === totalQ - 1 ? "查看结果" : "下一题 →";
+  $("btnNext").style.opacity = answers[current] === -1 ? "0.4" : "1";
+  updateProgress();
+}
+
+function selectOption (idx) {
+  answers[current] = idx;
+  renderQuestion();
+}
+
+function nextQuestion () {
+  if (answers[current] === -1) return; // 没选不能继续
+  if (current < totalQ - 1) { current++; renderQuestion(); }
+  else { showResult(); }
+}
+
+function prevQuestion () {
+  if (current > 0) { current--; renderQuestion(); }
+}
+
+function start () {
+  answers = new Array(totalQ).fill(-1);
+  current = 0;
+  showStep("stepQuestion");
+  renderQuestion();
+}
+
+function showResult () {
+  showStep("stepResult");
+
+  var total = 0;
+  for (var i = 0; i < answers.length; i++) {
+    total += (answers[i] + 1); // A=1, B=2, C=3, D=4
+  }
+
+  // Map score to personality segment (15 segments, 3 pts each)
+  var idx = Math.min(Math.floor((total - 15) / 3), personalities.length - 1);
+  var p = personalities[idx];
+
+  $("resultEmoji").textContent = p.emoji;
+  $("resultName").textContent = p.name;
+  $("resultDesc").textContent = p.desc;
+  $("resultExtra").innerHTML = promoHTML;
+}
+
+function restart () {
+  start();
+}
+</script>
+</body>
+</html>
