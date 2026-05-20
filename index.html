@@ -194,7 +194,7 @@
       <div class="icon">📚</div>
       <h1>学习人格测试</h1>
       <p class="subtitle">SBTI平替款！共15道题，无对错<br>凭第一反应冲就完事儿，不搞虚的～<br>每道题对应你的学习DNA<br>最后解锁专属"学习人格标签"</p>
-      <button class="btn btn-primary" onclick="start()">开始测试</button>
+      <button class="btn btn-primary" id="btnStart" onclick="start()">开始测试</button>
     </div>
   </div>
 
@@ -320,6 +320,7 @@ function prevQuestion () {
 }
 
 function start () {
+  $("btnStart").textContent = "加载中...";
   answers = new Array(totalQ).fill(-1);
   current = 0;
   showStep("stepQuestion");
